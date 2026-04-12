@@ -1,6 +1,5 @@
 package com.ibtihel.app.repositories;
 
-
 import com.ibtihel.app.entities.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,10 +11,13 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByCode(String code);
+    
     List<Product> findByNameContainingIgnoreCaseAndCodeContainingIgnoreCase(
             String name,
             String code
     );
 
     List<Product> findByCategoryId(Long categoryId);
+    
+    Optional<Product> findByName(String name);
 }

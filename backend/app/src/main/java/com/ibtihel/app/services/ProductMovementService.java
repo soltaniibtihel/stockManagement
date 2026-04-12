@@ -30,6 +30,11 @@ public class ProductMovementService {
     }
 
     public ProductMovement save(ProductMovement productMovement) {
+        // Ensure bidirectional relationship is properly set before persiting
+        if (productMovement.getDetail() != null) {
+            productMovement.getDetail().setProductMovement(productMovement);
+        }
+
         // Automatically create a detail object if not present, because they are linked.
         ProductMovement savedMovement = productMovementRepository.save(productMovement);
         

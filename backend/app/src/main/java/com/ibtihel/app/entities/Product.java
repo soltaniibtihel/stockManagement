@@ -28,11 +28,11 @@ public class Product {
     @Column(length = 1000)
     private String description;
 
-    private int shelfLife; // in days
+    private Integer shelfLife; // in days
 
-    private double stockQuantity;
+    private Double stockQuantity;
 
-    private double safetyStock;
+    private Double safetyStock;
 
 
     public Long getId() {
@@ -76,27 +76,27 @@ public class Product {
         this.unit = unit;
     }
 
-    public int getShelfLife() {
+    public Integer getShelfLife() {
         return shelfLife;
     }
 
-    public void setShelfLife(int shelfLife) {
+    public void setShelfLife(Integer shelfLife) {
         this.shelfLife = shelfLife;
     }
 
-    public double getStockQuantity() {
+    public Double getStockQuantity() {
         return stockQuantity;
     }
 
-    public void setStockQuantity(double stockQuantity) {
+    public void setStockQuantity(Double stockQuantity) {
         this.stockQuantity = stockQuantity;
     }
 
-    public double getSafetyStock() {
+    public Double getSafetyStock() {
         return safetyStock;
     }
 
-    public void setSafetyStock(double safetyStock) {
+    public void setSafetyStock(Double safetyStock) {
         this.safetyStock = safetyStock;
     }
 

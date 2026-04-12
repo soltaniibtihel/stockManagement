@@ -22,7 +22,19 @@ public class ProductMovementDetail {
     @JsonIgnoreProperties("detail")
     private ProductMovement productMovement;
 
-    private double unitPrice;
+    private Double unitPrice;
 
-    private double totalPrice;
+    private Double totalPrice;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public ProductMovement getProductMovement() { return productMovement; }
+    public void setProductMovement(ProductMovement productMovement) { this.productMovement = productMovement; }
+    
+    public Double getUnitPrice() { return unitPrice; }
+    public void setUnitPrice(Double unitPrice) { this.unitPrice = unitPrice; }
+    
+    public Double getTotalPrice() { return totalPrice; }
+    public void setTotalPrice(Double totalPrice) { this.totalPrice = totalPrice; }
 }

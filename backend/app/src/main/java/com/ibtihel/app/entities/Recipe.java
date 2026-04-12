@@ -16,7 +16,7 @@ public class Recipe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private double ingredientQuantity;
+    private Double ingredientQuantity;
 
     private String unit;
 
@@ -38,11 +38,11 @@ public class Recipe {
         this.id = id;
     }
 
-    public double getIngredientQuantity() {
+    public Double getIngredientQuantity() {
         return ingredientQuantity;
     }
 
-    public void setIngredientQuantity(double ingredientQuantity) {
+    public void setIngredientQuantity(Double ingredientQuantity) {
         this.ingredientQuantity = ingredientQuantity;
     }
 

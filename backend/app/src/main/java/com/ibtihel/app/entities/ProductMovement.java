@@ -23,7 +23,7 @@ public class ProductMovement {
     @JsonIgnoreProperties({"description", "safetyStock", "stockQuantity", "unit", "shelfLife", "category"})
     private Product product;
 
-    private double quantity;
+    private Double quantity;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -39,6 +39,29 @@ public class ProductMovement {
     protected void onCreate() {
         if (date == null) {
             date = LocalDate.now();
+        }
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public Product getProduct() { return product; }
+    public void setProduct(Product product) { this.product = product; }
+    
+    public Double getQuantity() { return quantity; }
+    public void setQuantity(Double quantity) { this.quantity = quantity; }
+    
+    public ProductMovementType getType() { return type; }
+    public void setType(ProductMovementType type) { this.type = type; }
+    
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
+    
+    public ProductMovementDetail getDetail() { return detail; }
+    public void setDetail(ProductMovementDetail detail) { 
+        this.detail = detail; 
+        if (detail != null) {
+            detail.setProductMovement(this);
         }
     }
 }

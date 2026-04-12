@@ -1,5 +1,6 @@
 package com.ibtihel.app.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,9 +21,10 @@ public class Warehouse {
 
     private String name;
     private String location;
-    private double capacity;
+    private Double capacity;
 
     @OneToMany(mappedBy = "warehouse")
+    @JsonIgnore
     private List<Stock> stocks;
 
     public Long getId() {
@@ -49,11 +51,11 @@ public class Warehouse {
         this.location = location;
     }
 
-    public double getCapacity() {
+    public Double getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(double capacity) {
+    public void setCapacity(Double capacity) {
         this.capacity = capacity;
     }
 

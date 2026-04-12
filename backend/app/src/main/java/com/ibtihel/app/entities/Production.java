@@ -3,7 +3,7 @@ package com.ibtihel.app.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "productions")
@@ -18,10 +18,9 @@ public class Production {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date productionDate;
+    private LocalDateTime productionDate;
 
-    private double producedQuantity;
+    private Double producedQuantity;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -43,19 +42,19 @@ public class Production {
         this.id = id;
     }
 
-    public Date getProductionDate() {
+    public LocalDateTime getProductionDate() {
         return productionDate;
     }
 
-    public void setProductionDate(Date productionDate) {
+    public void setProductionDate(LocalDateTime productionDate) {
         this.productionDate = productionDate;
     }
 
-    public double getProducedQuantity() {
+    public Double getProducedQuantity() {
         return producedQuantity;
     }
 
-    public void setProducedQuantity(double producedQuantity) {
+    public void setProducedQuantity(Double producedQuantity) {
         this.producedQuantity = producedQuantity;
     }
 

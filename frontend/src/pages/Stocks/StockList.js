@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload, AlertCircle, CheckCircle } from 'lucide-react';
 import StockService from '../../services/stockService';
+import ImportService from '../../services/importService';
 import StockDashboards from './StockDashboards';
 
 const StockList = () => {
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [importStatus, setImportStatus] = useState(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchStocks();
@@ -15,11 +18,40 @@ const StockList = () => {
   const fetchStocks = async () => {
     try {
       const response = await StockService.getAll();
-      setStocks(response.data);
+      setStocks(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching stocks:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setLoading(true);
+    setImportStatus(null);
+    try {
+      const response = await ImportService.importStocks(file);
+      setImportStatus({
+        type: 'success',
+        message: response.data.message
+      });
+      fetchStocks(); // Refresh list after import
+    } catch (error) {
+      console.error('Import error:', error);
+      setImportStatus({
+        type: 'error',
+        message: error.response?.data?.error || 'Failed to import Excel file.'
+      });
+    } finally {
+      setLoading(false);
+      event.target.value = ''; // Reset input
     }
   };
 
@@ -34,16 +66,40 @@ const StockList = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading && stocks.length === 0) return <div>Loading...</div>;
 
   return (
     <div>
       <div className="page-title">
         Stock Management & Analysis
-        <Link to="/stocks/new" className="btn btn-primary" style={{ marginLeft: 'auto', fontSize: '1rem' }}>
-          <Plus size={18} /> Add Stock
-        </Link>
+        <div style={{ display: 'flex', gap: '1rem', marginLeft: 'auto' }}>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+            accept=".xlsx, .xls"
+          />
+          <button 
+            onClick={handleImportClick} 
+            className="btn btn-secondary" 
+            style={{ fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            disabled={loading}
+          >
+            <Upload size={18} /> Import Excel
+          </button>
+          <Link to="/stocks/new" className="btn btn-primary" style={{ fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Plus size={18} /> Add Stock
+          </Link>
+        </div>
       </div>
+
+      {importStatus && (
+        <div className={`alert ${importStatus.type === 'success' ? 'alert-success' : 'alert-danger'}`} style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {importStatus.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+          {importStatus.message}
+        </div>
+      )}
 
       <StockDashboards stocks={stocks} />
 
