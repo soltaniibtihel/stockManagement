@@ -63,4 +63,8 @@ public class ProductMovementService {
     public void deleteById(Long id) {
         productMovementRepository.deleteById(id);
     }
+
+    public List<ProductMovement> getMovementsByProductId(Long productId) {
+        return productMovementRepository.findByProductIdOrderByDateAsc(productId);
+    }
 }

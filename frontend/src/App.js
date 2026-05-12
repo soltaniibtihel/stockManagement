@@ -1,6 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import AuthPage from './pages/Auth/AuthPage';
 import './App.css';
 
 import CategoryList from './pages/Categories/CategoryList';
@@ -21,54 +24,73 @@ import StockForm from './pages/Stocks/StockForm';
 import ProductMovementList from './pages/ProductMovements/ProductMovementList';
 import ProductMovementForm from './pages/ProductMovements/ProductMovementForm';
 import ProductMovementDetailView from './pages/ProductMovements/ProductMovementDetailView';
+import Dashboard from './pages/Dashboard/Dashboard';
 
-// Placeholder Pages (we will create these next)
-const Dashboard = () => <div><h1 className="page-title">Dashboard</h1><div className="card">Welcome to Med Oil Project Admin Dashboard</div></div>;
+const ProtectedLayout = () => {
+  return (
+    <ProtectedRoute>
+      <Layout>
+        <Outlet />
+      </Layout>
+    </ProtectedRoute>
+  );
+};
 
 function App() {
   return (
-    <Router>
-      <Layout>
+    <AuthProvider>
+      <Router>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/auth" element={<AuthPage />} />
           
-          <Route path="/users" element={<UserList />} />
-          <Route path="/users/new" element={<UserForm />} />
-          <Route path="/users/edit/:id" element={<UserForm />} />
-          
-          <Route path="/stocks" element={<StockList />} />
-          <Route path="/stocks/new" element={<StockForm />} />
-          <Route path="/stocks/edit/:id" element={<StockForm />} />
-          
-          <Route path="/categories" element={<CategoryList />} />
-          <Route path="/categories/new" element={<CategoryForm />} />
-          <Route path="/categories/edit/:id" element={<CategoryForm />} />
-          
-          <Route path="/products" element={<ProductList />} />
-          <Route path="/products/new" element={<ProductForm />} />
-          <Route path="/products/edit/:id" element={<ProductForm />} />
-          
-          <Route path="/productions" element={<ProductionList />} />
-          <Route path="/productions/new" element={<ProductionForm />} />
-          <Route path="/productions/edit/:id" element={<ProductionForm />} />
-          
-          <Route path="/recipes" element={<RecipeList />} />
-          <Route path="/recipes/new" element={<RecipeForm />} />
-          <Route path="/recipes/edit/:id" element={<RecipeForm />} />
-          
-          <Route path="/warehouses" element={<WarehouseList />} />
-          <Route path="/warehouses/new" element={<WarehouseForm />} />
-          <Route path="/warehouses/edit/:id" element={<WarehouseForm />} />
-          
-          <Route path="/product-movements" element={<ProductMovementList />} />
-          <Route path="/product-movements/new" element={<ProductMovementForm />} />
-          <Route path="/product-movements/edit/:id" element={<ProductMovementForm />} />
-          <Route path="/product-movements/:id/detail" element={<ProductMovementDetailView />} />
-          
+          {/* Protected Routes wrapped in Layout */}
+          <Route element={<ProtectedLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            
+            {/* We could restrict users route to ADMIN or DIRECTOR */}
+            <Route path="/users" element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'DIRECTOR']}>
+                <UserList />
+              </ProtectedRoute>
+            } />
+            <Route path="/users/new" element={<ProtectedRoute allowedRoles={['ADMIN']}><UserForm /></ProtectedRoute>} />
+            <Route path="/users/edit/:id" element={<ProtectedRoute allowedRoles={['ADMIN']}><UserForm /></ProtectedRoute>} />
+            
+            <Route path="/stocks" element={<StockList />} />
+            <Route path="/stocks/new" element={<StockForm />} />
+            <Route path="/stocks/edit/:id" element={<StockForm />} />
+            
+            <Route path="/categories" element={<CategoryList />} />
+            <Route path="/categories/new" element={<CategoryForm />} />
+            <Route path="/categories/edit/:id" element={<CategoryForm />} />
+            
+            <Route path="/products" element={<ProductList />} />
+            <Route path="/products/new" element={<ProductForm />} />
+            <Route path="/products/edit/:id" element={<ProductForm />} />
+            
+            <Route path="/productions" element={<ProductionList />} />
+            <Route path="/productions/new" element={<ProductionForm />} />
+            <Route path="/productions/edit/:id" element={<ProductionForm />} />
+            
+            <Route path="/recipes" element={<RecipeList />} />
+            <Route path="/recipes/new" element={<RecipeForm />} />
+            <Route path="/recipes/edit/:id" element={<RecipeForm />} />
+            
+            <Route path="/warehouses" element={<WarehouseList />} />
+            <Route path="/warehouses/new" element={<WarehouseForm />} />
+            <Route path="/warehouses/edit/:id" element={<WarehouseForm />} />
+            
+            <Route path="/product-movements" element={<ProductMovementList />} />
+            <Route path="/product-movements/new" element={<ProductMovementForm />} />
+            <Route path="/product-movements/edit/:id" element={<ProductMovementForm />} />
+            <Route path="/product-movements/:id/detail" element={<ProductMovementDetailView />} />
+            
+          </Route>
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Layout>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 

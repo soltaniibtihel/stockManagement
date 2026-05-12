@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit, Trash2, Upload, AlertCircle, CheckCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload, AlertCircle, CheckCircle, Brain } from 'lucide-react';
 import StockService from '../../services/stockService';
 import ImportService from '../../services/importService';
 import StockDashboards from './StockDashboards';
+import StockAiAssistant from './StockAiAssistant';
 
 const StockList = () => {
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [importStatus, setImportStatus] = useState(null);
+  const [selectedStockForAi, setSelectedStockForAi] = useState(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -136,6 +138,14 @@ const StockList = () => {
                         <Link to={`/stocks/edit/${stock.id}`} className="btn btn-secondary">
                           <Edit size={16} />
                         </Link>
+                        <button 
+                          onClick={() => setSelectedStockForAi(stock)} 
+                          className="btn btn-primary" 
+                          style={{ background: 'linear-gradient(135deg, #a78bfa 0%, #6366f1 100%)', border: 'none' }}
+                          title="AI Insight & Replenishment"
+                        >
+                          <Brain size={16} />
+                        </button>
                         <button onClick={() => handleDelete(stock.id)} className="btn btn-danger">
                           <Trash2 size={16} />
                         </button>
@@ -148,6 +158,13 @@ const StockList = () => {
           </table>
         </div>
       </div>
+
+      {selectedStockForAi && (
+        <StockAiAssistant 
+          stock={selectedStockForAi} 
+          onClose={() => setSelectedStockForAi(null)} 
+        />
+      )}
     </div>
   );
 };

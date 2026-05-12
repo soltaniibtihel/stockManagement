@@ -1,15 +1,48 @@
-# Backend (Spring Boot)
-backend/target/
-*.log
+# Backend (Spring Boot / Maven)
+backend/**/target/
+backend/**/*.log
 *.class
 
-# Frontend (React)
+# Frontend (React) — node_modules/build aussi couverts par frontend/.gitignore
 frontend/node_modules/
 frontend/build/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
-# IDE
+# Python / ML
+ml/venv/
+ml/.venv/
+ml/__pycache__/
+ml/**/__pycache__/
+*.py[cod]
+*$py.class
+ml/.pytest_cache/
+ml/.mypy_cache/
+ml/*.egg-info/
+ml/dist/
+ml/.env
+ml/.env.*
+# Fichiers générés par l’API d’upload / tests locaux (ne pas versionner)
+ml/data/uploaded_*
+ml/data/*tmp*
+ml/data/test_*.csv
+ml/data/test_*.xls
+
+# IDE & outils
 .idea/
 .vscode/
+*.swp
+*.swo
+*~
 
 # OS
 .DS_Store
+Thumbs.db
+
+# Logs & divers
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -47,4 +47,9 @@ public class ProductMovementController {
         productMovementService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/product/{productId}")
+    public List<ProductMovement> getMovementsByProductId(@PathVariable Long productId) {
+        return productMovementService.getMovementsByProductId(productId);
+    }
 }

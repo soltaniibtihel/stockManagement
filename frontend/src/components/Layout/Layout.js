@@ -1,6 +1,7 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
+import Chatbot from '../Chatbot/Chatbot';
 import './Layout.css';
 
 const Layout = ({ children }) => {
@@ -13,6 +14,7 @@ const Layout = ({ children }) => {
           {children}
         </main>
       </div>
+      <Chatbot />
     </div>
   );
 };
