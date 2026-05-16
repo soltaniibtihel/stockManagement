@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #064e3b 50%, #022c22 100%);
   position: relative;
   overflow: hidden;
   font-family: 'Inter', sans-serif;
@@ -14,7 +14,7 @@
   position: absolute;
   width: 40vw;
   height: 40vw;
-  background: rgba(79, 70, 229, 0.4);
+  background: rgba(16, 185, 129, 0.4);
   border-radius: 50%;
   filter: blur(100px);
   top: -10vw;
@@ -27,7 +27,7 @@
   position: absolute;
   width: 30vw;
   height: 30vw;
-  background: rgba(16, 185, 129, 0.25);
+  background: rgba(5, 150, 105, 0.25);
   border-radius: 50%;
   filter: blur(80px);
   bottom: -5vw;
@@ -67,7 +67,7 @@
 .auth-logo {
   font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(to right, #818cf8, #34d399);
+  background: linear-gradient(to right, #34d399, #10b981);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 0.5rem;
@@ -151,13 +151,13 @@
 }
 
 .auth-form input:focus, .auth-form select:focus {
-  border-color: #6366f1;
+  border-color: #10b981;
   background: rgba(15, 23, 42, 0.8);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 }
 
 .auth-form input:focus + .input-icon, .auth-form select:focus + .input-icon {
-  color: #6366f1;
+  color: #10b981;
 }
 
 .auth-error {
@@ -174,7 +174,7 @@
 }
 
 .auth-button {
-  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -192,7 +192,7 @@
 
 .auth-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);
 }
 
 .auth-button:active {

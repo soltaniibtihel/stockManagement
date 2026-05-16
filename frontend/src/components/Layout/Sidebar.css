@@ -60,7 +60,7 @@
 .nav-link.active {
   background-color: var(--primary);
   color: white;
-  box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
 }
 
 .sidebar-footer {

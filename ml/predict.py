@@ -1,35 +1,39 @@
-import pickle
-import numpy as np
+import pandas as pd
+from ml.model import load_model
 
-# Global variable to hold the model in memory
-_model = None
 
-def get_model():
-    global _model
-    if _model is None:
-        try:
-            with open("models/model.pkl", "rb") as f:
-                _model = pickle.load(f)
-        except FileNotFoundError:
-            print("Error: models/model.pkl not found. Please run train.py first.")
-    return _model
+def predict_demand(input_features: dict) -> dict:
+    """
+    Load the saved model and return predicted demand and recommended stock.
 
-def reload_model():
-    # Forces the model to be loaded fresh from disk on next prediction
-    global _model
-    _model = None
-    get_model()
+    Args:
+        input_features: dict with keys matching the trained feature columns
+                        (month, day_of_week, moving_avg, consumption,
+                         optionally product_encoded).
 
-def predict(moving_avg, consumption, lag_1, day_of_week, month, is_weekend, is_month_end, rolling_std):
-    model = get_model()
-    
-    if model is None:
-        return {"error": "Model not initialized"}
+    Returns:
+        {"predicted_demand": float, "recommended_stock": float}
+    """
+    pipeline = load_model()
 
-    # Full Input vector: 8 features
-    features = [[moving_avg, consumption, lag_1, day_of_week, month, is_weekend, is_month_end, rolling_std]]
-    prediction = model.predict(features)[0]
+    feature_names = pipeline.feature_names_in_ if hasattr(pipeline, "feature_names_in_") else None
+    if feature_names is None:
+        # Derive from the imputer step
+        feature_names = pipeline.named_steps["imputer"].feature_names_in_
+
+    row = {col: input_features.get(col, 0) for col in feature_names}
+    X = pd.DataFrame([row])
+
+    print(f"[PREDICT] Input features: {row}")
+
+    prediction = float(pipeline.predict(X)[0])
+    prediction = max(0.0, round(prediction, 4))
+
+    recommended = round(prediction * 1.3, 4)
+
+    print(f"[PREDICT] predicted_demand={prediction}, recommended_stock={recommended}")
 
     return {
-        "predicted_demand": round(prediction, 2)
+        "predicted_demand": prediction,
+        "recommended_stock": recommended,
     }
