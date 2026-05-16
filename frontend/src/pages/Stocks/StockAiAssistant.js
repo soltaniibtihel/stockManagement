@@ -23,8 +23,12 @@ const StockAiAssistant = ({ stock, onClose }) => {
           throw new Error("Pas assez de données historiques pour ce produit (minimum 3 mouvements requis).");
         }
 
-        // 2. Call ML API
-        const predRes = await mlService.predictDemand(quantities);
+        // 2. Call backend → ML service
+        const predRes = await mlService.predictDemand(
+          quantities,
+          stock.safetyStock ?? 0,
+          stock.quantityAvailable ?? 0
+        );
         setPrediction(predRes.data);
       } catch (err) {
         console.error("AI Insight Error:", err);

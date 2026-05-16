@@ -61,8 +61,8 @@ const Dashboard = () => {
       const res = await mlService.uploadAndTrain(file);
       setAiMetrics({
         success: true,
-        message: res.data.message,
-        metrics: res.data.metrics
+        message: res.data.message || `Model trained on ${res.data.rows_used ?? '?'} rows.`,
+        metrics: res.data.metrics || null,
       });
     } catch (err) {
       setAiMetrics({
@@ -176,11 +176,9 @@ const Dashboard = () => {
               </div>
               <div style={{ flex: 1 }}>
                 <h4 style={{ color: '#34d399', margin: '0 0 0.25rem 0' }}>{aiMetrics.message}</h4>
-                <div style={{ display: 'flex', gap: '2rem', color: '#cbd5e1', fontSize: '0.9rem' }}>
-                  <span><strong>R² Score:</strong> {aiMetrics.metrics.r2} (Accuracy)</span>
-                  <span><strong>RMSE:</strong> {aiMetrics.metrics.rmse}</span>
-                  <span><strong>MAE:</strong> {aiMetrics.metrics.mae}</span>
-                </div>
+                <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem' }}>
+                  The model is ready. You can now use AI stock predictions on any product.
+                </p>
               </div>
             </div>
           ) : (

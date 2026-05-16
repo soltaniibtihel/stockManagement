@@ -1,29 +1,29 @@
-import axios from 'axios';
-
-const ML_API_URL = 'http://127.0.0.1:8000'; // FastAPI local model
+import api from './api';
 
 class MlService {
   /**
-   * Upload an Excel/CSV history file to train the AI
+   * Upload an Excel file to train the model.
+   * Routes through Java backend → ML service.
    */
   uploadAndTrain(file) {
     const formData = new FormData();
     formData.append('file', file);
-
-    return axios.post(`${ML_API_URL}/upload-and-train`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    return api.post('/ml/train', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
   }
 
   /**
-   * Use the trained AI to get a prediction based on recent historical facts
-   * @param {number[]} historicalQuantities Array of values (oldest to newest)
+   * Get a demand prediction for a product.
+   * @param {number[]} historicalQuantities  Recent movement quantities (oldest → newest)
+   * @param {number}   safetyStock           Stock safety threshold
+   * @param {number}   currentQuantity       Current available quantity
    */
-  predictDemand(historicalQuantities) {
-    return axios.post(`${ML_API_URL}/predict`, {
-      historical_quantities: historicalQuantities
+  predictDemand(historicalQuantities, safetyStock = 0, currentQuantity = 0) {
+    return api.post('/ml/predict', {
+      historical_quantities: historicalQuantities,
+      safety_stock: safetyStock,
+      current_quantity: currentQuantity,
     });
   }
 }

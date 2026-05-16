@@ -42,14 +42,16 @@ async def train(file: UploadFile = File(...)):
         X, y = build_features(df)
         print(f"[TRAIN] Feature matrix shape: {X.shape}")
 
-        pipeline = train_model(X, y)
+        pipeline, metrics = train_model(X, y)
         save_model(pipeline)
 
         return {
             "status": "success",
+            "message": f"Model trained successfully on {X.shape[0]} rows.",
             "file": file.filename,
             "rows_used": X.shape[0],
             "features": list(X.columns),
+            "metrics": metrics,
         }
 
     except Exception as e:
