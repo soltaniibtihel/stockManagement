@@ -7,7 +7,6 @@ import com.ibtihel.app.entities.ProductMovementDetail;
 import com.ibtihel.app.entities.ProductMovementType;
 import com.ibtihel.app.entities.Production;
 import com.ibtihel.app.entities.ProductionStatus;
-import com.ibtihel.app.entities.ProductType;
 import com.ibtihel.app.entities.Stock;
 import com.ibtihel.app.entities.User;
 import com.ibtihel.app.entities.Warehouse;
@@ -309,11 +308,7 @@ public class ExcelService {
      *   C : unit          (String  — ex. "kg", "L", "pcs")
      *   D : description   (String  — optionnel)
      *   E : shelfLife     (Number  — durée de vie en jours, optionnel)
-     *   F : stockQuantity (Number  — quantité en stock initiale, optionnel)
-     *   G : safetyStock   (Number  — stock de sécurité, optionnel)
-     *   H : productType   (String  — RAW_MATERIAL | FINISHED_PRODUCT | SEMI_FINISHED |
-     *                                PACKAGING | BY_PRODUCT   défaut : FINISHED_PRODUCT)
-     *   I : category      (String  — nom exact de la catégorie, optionnel)
+     *   F : category      (String  — nom exact de la catégorie, optionnel)
      */
     public Map<String, Object> importProducts(MultipartFile file) throws Exception {
         InputStream is = file.getInputStream();
@@ -356,21 +351,8 @@ public class ExcelService {
                 Double shelfLifeVal = getCellDouble(row.getCell(4));
                 if (shelfLifeVal > 0) product.setShelfLife(shelfLifeVal.intValue());
 
-                product.setStockQuantity(getCellDouble(row.getCell(5)));
-                product.setSafetyStock(getCellDouble(row.getCell(6)));
-
-                // productType (colonne H) — valeur enum ou défaut FINISHED_PRODUCT
-                String typeStr = getCellString(row.getCell(7)).toUpperCase().trim();
-                try {
-                    product.setProductType(typeStr.isEmpty()
-                            ? ProductType.FINISHED_PRODUCT
-                            : ProductType.valueOf(typeStr));
-                } catch (IllegalArgumentException e) {
-                    product.setProductType(ProductType.FINISHED_PRODUCT);
-                }
-
-                // Catégorie (colonne I) — recherche par nom insensible à la casse
-                String categoryName = getCellString(row.getCell(8));
+                // Catégorie (colonne F) — recherche par nom insensible à la casse
+                String categoryName = getCellString(row.getCell(5));
                 if (!categoryName.isEmpty()) {
                     allCategories.stream()
                             .filter(c -> c.getName().equalsIgnoreCase(categoryName))

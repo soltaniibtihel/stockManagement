@@ -23,8 +23,7 @@ public class ImportController {
      * POST /api/import/products
      *
      * Colonnes Excel (header obligatoire) :
-     *   A: code | B: name | C: unit | D: description | E: shelfLife
-     *   F: stockQuantity | G: safetyStock | H: productType | I: category
+     *   A: code | B: name | C: unit | D: description | E: shelfLife | F: category
      *
      * Si le code existe déjà → mise à jour du produit.
      * Sinon → création d'un nouveau produit.

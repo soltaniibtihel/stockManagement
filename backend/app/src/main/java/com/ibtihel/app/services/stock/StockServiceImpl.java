@@ -31,6 +31,8 @@ public class StockServiceImpl implements StockService {
         if (stock.getWarehouse() != null && stock.getWarehouse().getId() != null) {
             stock.setWarehouse(warehouseRepository.findById(stock.getWarehouse().getId()).orElse(null));
         }
+        checkCategoryMatch(stock.getProduct(), stock.getWarehouse());
+        checkCapacity(stock.getWarehouse(), stock.getQuantityAvailable(), null);
         return stockRepository.save(stock);
     }
 
@@ -59,8 +61,34 @@ public class StockServiceImpl implements StockService {
         if (updatedStock.getWarehouse() != null && updatedStock.getWarehouse().getId() != null) {
             existingStock.setWarehouse(warehouseRepository.findById(updatedStock.getWarehouse().getId()).orElse(null));
         }
-        
+        checkCategoryMatch(existingStock.getProduct(), existingStock.getWarehouse());
+        checkCapacity(existingStock.getWarehouse(), existingStock.getQuantityAvailable(), id);
         return stockRepository.save(existingStock);
+    }
+
+    private void checkCategoryMatch(com.ibtihel.app.entities.Product product, com.ibtihel.app.entities.Warehouse warehouse) {
+        if (product == null || warehouse == null) return;
+        com.ibtihel.app.entities.Category pCat = product.getCategory();
+        com.ibtihel.app.entities.Category wCat = warehouse.getCategory();
+        if (pCat == null || wCat == null) return;
+        if (!pCat.getId().equals(wCat.getId())) {
+            throw new IllegalArgumentException(
+                String.format("Category mismatch: product belongs to '%s' but warehouse belongs to '%s'.",
+                    pCat.getName(), wCat.getName()));
+        }
+    }
+
+    private void checkCapacity(com.ibtihel.app.entities.Warehouse warehouse, Double newQty, Long excludeStockId) {
+        if (warehouse == null || warehouse.getCapacity() == null || warehouse.getCapacity() <= 0) return;
+        double used = excludeStockId == null
+                ? stockRepository.sumQuantityByWarehouseId(warehouse.getId())
+                : stockRepository.sumQuantityByWarehouseIdExcluding(warehouse.getId(), excludeStockId);
+        double qty = newQty == null ? 0 : newQty;
+        if (used + qty > warehouse.getCapacity()) {
+            throw new IllegalArgumentException(
+                String.format("Capacity exceeded: warehouse '%s' has capacity %.2f, already used %.2f, requested %.2f.",
+                    warehouse.getName(), warehouse.getCapacity(), used, qty));
+        }
     }
 
     @Override

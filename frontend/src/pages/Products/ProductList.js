@@ -86,7 +86,7 @@ const ProductList = () => {
       || p.description?.toLowerCase().includes(q)
       || p.category?.name?.toLowerCase().includes(q)
       || p.unit?.toLowerCase().includes(q);
-    const matchType = !typeFilter || p.productType === typeFilter;
+    const matchType = !typeFilter || p.category?.productType === typeFilter;
     return matchQ && matchType;
   });
 
@@ -242,15 +242,13 @@ const ProductList = () => {
                 <th>Description</th>
                 <th>Category</th>
                 <th>Unit</th>
-                <th>Stock Qty</th>
-                <th>Safety Stock</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan="11" style={{ textAlign:'center', color:'var(--text-muted)', padding:'2rem' }}>
+                  <td colSpan="9" style={{ textAlign:'center', color:'var(--text-muted)', padding:'2rem' }}>
                     {search ? 'Aucun résultat pour « ' + search + ' »' : 'Aucun produit trouvé.'}
                   </td>
                 </tr>
@@ -261,7 +259,7 @@ const ProductList = () => {
                     <td><span className="badge badge-blue">{product.code}</span></td>
                     <td>
                       {(() => {
-                        const ts = TYPE_STYLE[product.productType] || TYPE_STYLE.FINISHED_PRODUCT;
+                        const ts = TYPE_STYLE[product.category?.productType] || {};
                         return (
                           <span style={{ display:'inline-block', padding:'2px 9px', borderRadius:'10px',
                             fontSize:'0.75rem', fontWeight:600, background: ts.bg, color: ts.color, whiteSpace:'nowrap' }}>
@@ -276,8 +274,6 @@ const ProductList = () => {
                     </td>
                     <td>{product.category?.name || '-'}</td>
                     <td>{product.unit}</td>
-                    <td>{product.stockQuantity || 0}</td>
-                    <td>{product.safetyStock || 0}</td>
                     <td>
                       <div style={{ display:'flex', gap:'0.5rem' }}>
                         <Link to={`/products/edit/${product.id}`} className="btn btn-secondary">

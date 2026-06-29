@@ -30,11 +30,6 @@ public class Product {
 
     private Integer shelfLife; // in days
 
-    private Double stockQuantity;
-
-    private Double safetyStock;
-
-
     public Long getId() {
         return id;
     }
@@ -83,29 +78,6 @@ public class Product {
     public void setShelfLife(Integer shelfLife) {
         this.shelfLife = shelfLife;
     }
-
-    public Double getStockQuantity() {
-        return stockQuantity;
-    }
-
-    public void setStockQuantity(Double stockQuantity) {
-        this.stockQuantity = stockQuantity;
-    }
-
-    public Double getSafetyStock() {
-        return safetyStock;
-    }
-
-    public void setSafetyStock(Double safetyStock) {
-        this.safetyStock = safetyStock;
-    }
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "product_type", nullable = false)
-    private ProductType productType = ProductType.FINISHED_PRODUCT;
-
-    public ProductType getProductType() { return productType; }
-    public void setProductType(ProductType productType) { this.productType = productType; }
 
     @ManyToOne
     @JoinColumn(name = "category_id")

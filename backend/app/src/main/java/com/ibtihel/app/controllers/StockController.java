@@ -2,6 +2,7 @@ package com.ibtihel.app.controllers;
 
 import com.ibtihel.app.entities.Stock;
 import com.ibtihel.app.services.stock.StockService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,8 +19,12 @@ public class StockController {
     }
 
     @PostMapping
-    public Stock createStock(@RequestBody Stock stock) {
-        return stockService.createStock(stock);
+    public ResponseEntity<?> createStock(@RequestBody Stock stock) {
+        try {
+            return ResponseEntity.ok(stockService.createStock(stock));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping
@@ -33,8 +38,12 @@ public class StockController {
     }
 
     @PutMapping("/{id}")
-    public Stock updateStock(@PathVariable Long id, @RequestBody Stock stock) {
-        return stockService.updateStock(id, stock);
+    public ResponseEntity<?> updateStock(@PathVariable Long id, @RequestBody Stock stock) {
+        try {
+            return ResponseEntity.ok(stockService.updateStock(id, stock));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")

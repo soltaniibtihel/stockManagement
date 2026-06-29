@@ -17,4 +17,12 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
 
     @Query("SELECT COALESCE(SUM(s.quantityAvailable), 0) FROM Stock s WHERE s.product.id = :productId")
     Double sumQuantityByProductId(Long productId);
+
+    @Query("SELECT COALESCE(SUM(s.quantityAvailable), 0) FROM Stock s WHERE s.warehouse.id = :warehouseId")
+    Double sumQuantityByWarehouseId(Long warehouseId);
+
+    @Query("SELECT COALESCE(SUM(s.quantityAvailable), 0) FROM Stock s WHERE s.warehouse.id = :warehouseId AND s.id <> :excludeId")
+    Double sumQuantityByWarehouseIdExcluding(Long warehouseId, Long excludeId);
+
+    List<Stock> findByWarehouseId(Long warehouseId);
 }

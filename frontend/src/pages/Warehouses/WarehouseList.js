@@ -53,13 +53,14 @@ const WarehouseList = () => {
                 <th>Name</th>
                 <th>Location</th>
                 <th>Capacity</th>
+                <th>Category</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {warehouses.length === 0 ? (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No warehouses found.</td>
+                  <td colSpan="6" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No warehouses found.</td>
                 </tr>
               ) : (
                 warehouses.map(warehouse => (
@@ -68,6 +69,7 @@ const WarehouseList = () => {
                     <td>{warehouse.name}</td>
                     <td>{warehouse.location}</td>
                     <td><span className="badge badge-green">{warehouse.capacity}</span></td>
+                    <td>{warehouse.category?.name || '-'}</td>
                     <td>
                       <div style={{ display: 'flex', gap: '0.5rem' }}>
                         <Link to={`/warehouses/edit/${warehouse.id}`} className="btn btn-secondary">

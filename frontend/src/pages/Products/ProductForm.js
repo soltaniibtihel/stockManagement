@@ -8,14 +8,6 @@ const ProductForm = () => {
   const navigate = useNavigate();
   const isEditMode = !!id;
 
-  const PRODUCT_TYPES = [
-    { value: 'RAW_MATERIAL',    label: '🧪 Matière Première (Raw Material)' },
-    { value: 'FINISHED_PRODUCT',label: '📦 Produit Fini (Finished Product)' },
-    { value: 'SEMI_FINISHED',   label: '⚙️ Semi-Fini (Semi-Finished)' },
-    { value: 'PACKAGING',       label: '🗃️ Emballage (Packaging)' },
-    { value: 'BY_PRODUCT',      label: '♻️ Sous-Produit (By-Product)' },
-  ];
-
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     code: '',
@@ -23,9 +15,6 @@ const ProductForm = () => {
     description: '',
     unit: '',
     shelfLife: 0,
-    stockQuantity: 0,
-    safetyStock: 0,
-    productType: 'FINISHED_PRODUCT',
     category: { id: '' }
   });
   const [loading, setLoading] = useState(true);
@@ -56,7 +45,7 @@ const ProductForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'categoryId') {
-      setFormData(prev => ({ ...prev, category: { id: value } }));
+      setFormData(prev => ({ ...prev, category: { id: value ? Number(value) : null } }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -140,45 +129,6 @@ const ProductForm = () => {
                 onChange={handleChange} 
                 min="0"
               />
-            </div>
-
-            <div className="form-group">
-              <label>Stock Quantity</label>
-              <input 
-                type="number" 
-                name="stockQuantity" 
-                value={formData.stockQuantity || 0} 
-                onChange={handleChange} 
-                min="0"
-                step="0.01"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Safety Stock</label>
-              <input 
-                type="number" 
-                name="safetyStock" 
-                value={formData.safetyStock || 0} 
-                onChange={handleChange} 
-                min="0"
-                step="0.01"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Type de produit</label>
-              <select
-                name="productType"
-                value={formData.productType || 'FINISHED_PRODUCT'}
-                onChange={handleChange}
-                style={{ fontWeight: formData.productType === 'RAW_MATERIAL' ? 600 : 'normal',
-                         borderColor: formData.productType === 'RAW_MATERIAL' ? 'rgba(245,158,11,0.5)' : '' }}
-              >
-                {PRODUCT_TYPES.map(t => (
-                  <option key={t.value} value={t.value}>{t.label}</option>
-                ))}
-              </select>
             </div>
 
             <div className="form-group">

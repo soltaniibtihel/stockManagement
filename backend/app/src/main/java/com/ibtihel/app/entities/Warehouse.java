@@ -3,6 +3,7 @@ package com.ibtihel.app.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import com.ibtihel.app.entities.Category;
 
 import java.util.List;
 
@@ -22,6 +23,13 @@ public class Warehouse {
     private String name;
     private String location;
     private Double capacity;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
 
     @OneToMany(mappedBy = "warehouse")
     @JsonIgnore

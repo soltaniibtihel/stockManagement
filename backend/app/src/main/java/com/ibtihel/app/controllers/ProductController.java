@@ -1,7 +1,6 @@
 package com.ibtihel.app.controllers;
 
 import com.ibtihel.app.entities.Product;
-import com.ibtihel.app.entities.ProductType;
 import com.ibtihel.app.repositories.ProductRepository;
 import com.ibtihel.app.services.product.ProductService;
 import org.springframework.web.bind.annotation.*;
@@ -64,13 +63,5 @@ public class ProductController {
         return productService.getProductsByCategory(categoryId);
     }
 
-    /**
-     * GET /api/products/by-type/RAW_MATERIAL
-     * Retourne tous les produits d'un type donné.
-     */
-    @GetMapping("/by-type/{type}")
-    public List<Product> getByType(@PathVariable ProductType type) {
-        return productRepository.findByProductType(type);
-    }
 }
 

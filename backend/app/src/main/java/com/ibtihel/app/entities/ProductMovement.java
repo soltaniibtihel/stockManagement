@@ -20,7 +20,7 @@ public class ProductMovement {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonIgnoreProperties({"description", "safetyStock", "stockQuantity", "unit", "shelfLife", "category"})
+    @JsonIgnoreProperties({"description", "unit", "shelfLife", "category"})
     private Product product;
 
     private Double quantity;
