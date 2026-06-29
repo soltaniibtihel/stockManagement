@@ -46,9 +46,10 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
-.kpi-icon.blue { color: #60a5fa; background: rgba(59, 130, 246, 0.2); }
-.kpi-icon.green { color: #34d399; background: rgba(16, 185, 129, 0.2); }
-.kpi-icon.purple { color: #a78bfa; background: rgba(139, 92, 246, 0.2); }
+.kpi-icon.blue   { color: #60a5fa; background: rgba(59,  130, 246, 0.2); }
+.kpi-icon.green  { color: #34d399; background: rgba(16,  185, 129, 0.2); }
+.kpi-icon.purple { color: #a78bfa; background: rgba(139,  92, 246, 0.2); }
+.kpi-icon.orange { color: #f59e0b; background: rgba(245, 158,  11, 0.2); }
 
 .kpi-details {
   display: flex;
@@ -199,4 +200,174 @@
   border-radius: 8px !important;
   backdrop-filter: blur(8px) !important;
   color: #fff !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   RAW MATERIALS — Prévisions & Recommandations
+══════════════════════════════════════════════════════ */
+
+/* Grille 4 KPI (on passe à 4 colonnes) */
+@media (min-width: 1024px) {
+  .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Section RM */
+.rm-section {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.rm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.15s;
+}
+.rm-header:hover { background: rgba(255,255,255,0.02); }
+
+/* Grille cartes MP */
+.rm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+/* Carte individuelle */
+.rm-card {
+  background: rgba(15,23,42,0.6);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.rm-card:hover {
+  border-color: rgba(245,158,11,0.25);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+.rm-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.5rem;
+}
+
+.rm-name {
+  margin: 0 0 2px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rm-code {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #64748b;
+  letter-spacing: 0.04em;
+}
+
+/* Champs prévision */
+.rm-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem 0.5rem;
+}
+
+.rm-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rm-field-label {
+  display: flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.rm-input-wrap {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.rm-input-wrap:focus-within {
+  border-color: rgba(245,158,11,0.45);
+  background: rgba(245,158,11,0.04);
+}
+
+.rm-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 6px 8px;
+  font-size: 0.82rem;
+  color: #f1f5f9;
+  min-width: 0;
+}
+.rm-input::placeholder { color: #334155; font-size: 0.75rem; }
+
+.rm-unit {
+  padding: 0 8px;
+  font-size: 0.72rem;
+  color: #475569;
+  border-left: 1px solid rgba(255,255,255,0.07);
+  white-space: nowrap;
+}
+
+/* Notes */
+.rm-notes {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.rm-notes:focus { border-color: rgba(245,158,11,0.35); }
+.rm-notes::placeholder { color: #334155; }
+
+/* Résumé données saisies */
+.rm-summary {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0 1rem 0.85rem;
+}
+.rm-summary-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  border: 1px solid;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .rm-fields { grid-template-columns: 1fr; }
+  .rm-grid   { grid-template-columns: 1fr; }
 }

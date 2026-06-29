@@ -8,8 +8,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -25,59 +25,70 @@ public class MlServiceImpl implements MlService {
     }
 
     @Override
-    public Map<String, Object> predictDemand(List<Double> historicalQuantities,
-                                              double safetyStock,
-                                              double currentQuantity) {
-        // Compute features from historical data
-        double movingAvg = historicalQuantities.stream()
-                .mapToDouble(Double::doubleValue)
-                .average()
-                .orElse(0.0);
+    public Map<String, Object> predictYear(String productCode) {
+        UriComponentsBuilder uri = UriComponentsBuilder
+                .fromUriString(mlServiceUrl + "/predict-year");
 
-        double consumption = 0.0;
-        if (historicalQuantities.size() >= 2) {
-            double last  = historicalQuantities.get(historicalQuantities.size() - 1);
-            double first = historicalQuantities.get(0);
-            consumption  = Math.abs(last - first) / (historicalQuantities.size() - 1);
+        if (productCode != null && !productCode.isBlank()) {
+            uri.queryParam("product_code", productCode);
         }
-
-        LocalDate today = LocalDate.now();
-
-        Map<String, Object> mlRequest = new HashMap<>();
-        mlRequest.put("month",        today.getMonthValue());
-        mlRequest.put("day_of_week",  today.getDayOfWeek().getValue() - 1); // 0=Mon
-        mlRequest.put("moving_avg",   movingAvg);
-        mlRequest.put("consumption",  consumption);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(mlRequest, headers);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> mlResponse = restTemplate.postForObject(
-                mlServiceUrl + "/predict", entity, Map.class);
+        Map<String, Object> response = restTemplate.getForObject(uri.toUriString(), Map.class);
 
-        if (mlResponse == null) {
+        if (response == null) {
             throw new RuntimeException("Empty response from ML service");
         }
+        return response;
+    }
 
-        double predictedDemand = ((Number) mlResponse.get("predicted_demand")).doubleValue();
-        double optimizedStock  = predictedDemand + safetyStock;
-        double suggested       = Math.max(0, optimizedStock - currentQuantity);
-        boolean highPriority   = suggested > currentQuantity * 0.5;
+    @Override
+    public Map<String, Object> chat(String message) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("predicted_demand",             Math.round(predictedDemand * 100.0) / 100.0);
-        result.put("calculated_moving_avg",        Math.round(movingAvg * 100.0) / 100.0);
-        result.put("calculated_consumption",       Math.round(consumption * 100.0) / 100.0);
-        result.put("optimized_stock",              Math.round(optimizedStock * 100.0) / 100.0);
-        result.put("suggested_replenishment",      Math.round(suggested * 100.0) / 100.0);
-        result.put("is_reorder_highly_recommended", highPriority);
-        return result;
+            Map<String, String> body = Map.of("message", message);
+            HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> response = restTemplate.postForObject(
+                    mlServiceUrl + "/chat", entity, Map.class);
+
+            return response != null ? response : Map.of("response", "Aucune réponse du service ML.");
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de l'appel au chatbot ML : " + e.getMessage(), e);
+        }
     }
 
     @Override
     public Map<String, Object> uploadAndTrain(MultipartFile file) {
+        return forwardFileToMlService(file, "/train");
+    }
+
+    /**
+     * Transmet le fichier Excel au service Python /compare-rf-xgb.
+     *
+     * Le service Python :
+     *   1. Entraîne Random Forest sur les données
+     *   2. Entraîne XGBoost sur les mêmes données
+     *   3. Compare les métriques R², RMSE, MAE
+     *   4. Sauvegarde le meilleur modèle comme modèle actif
+     *   5. Retourne les métriques des deux modèles + le gagnant
+     */
+    @Override
+    public Map<String, Object> compareRfXgb(MultipartFile file) {
+        return forwardFileToMlService(file, "/compare-rf-xgb");
+    }
+
+    /**
+     * Méthode utilitaire : envoie un fichier multipart au service Python ML.
+     *
+     * @param file      fichier Excel à transmettre
+     * @param endpoint  chemin de l'endpoint Python (ex. "/train", "/compare-rf-xgb")
+     * @return réponse JSON du service Python
+     */
+    private Map<String, Object> forwardFileToMlService(MultipartFile file, String endpoint) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -96,11 +107,12 @@ public class MlServiceImpl implements MlService {
 
             @SuppressWarnings("unchecked")
             Map<String, Object> response = restTemplate.postForObject(
-                    mlServiceUrl + "/train", entity, Map.class);
+                    mlServiceUrl + endpoint, entity, Map.class);
 
             return response != null ? response : Collections.singletonMap("status", "no response");
         } catch (Exception e) {
-            throw new RuntimeException("Failed to forward file to ML service: " + e.getMessage(), e);
+            throw new RuntimeException(
+                    "Failed to forward file to ML service [" + endpoint + "]: " + e.getMessage(), e);
         }
     }
 }

@@ -1,9 +1,8 @@
-import axios from 'axios';
-
-const ML_API_URL = 'http://127.0.0.1:8000';
+import api from './api';
 
 const chatService = {
-  sendMessage: (message) => axios.post(`${ML_API_URL}/chat`, { message })
+  // Passe par le backend Java (port 8080) qui relaye vers le service ML Python
+  sendMessage: (message) => api.post('/ml/chat', { message })
 };
 
 export default chatService;

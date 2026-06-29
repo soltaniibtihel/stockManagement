@@ -1,54 +1,112 @@
+import numpy as np
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
 
 
-def build_features(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
-    """
-    Engineer features from a cleaned DataFrame and return (X, y).
+# Lag windows (in months) used for both training and prediction
+LAG_WINDOWS     = [1, 2, 3, 6, 12]
+ROLLING_WINDOWS = [3, 6, 12]
 
-    Expected columns: date, quantity, and optionally product_code.
-    Returns X (feature DataFrame) and y (target Series).
-    """
-    df = df.copy()
 
-    # Temporal features
-    df["month"] = df["date"].dt.month
-    df["day_of_week"] = df["date"].dt.dayofweek
+def _add_time_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Add month_index (global linear trend counter) derived from year_month."""
+    base = df["year_month"].min()
+    df["month_index"] = (
+        (df["year_month"].dt.year - base.year) * 12
+        + (df["year_month"].dt.month - base.month)
+    )
+    return df
 
-    has_product = "product_code" in df.columns
 
-    if has_product:
-        df["product_code"] = df["product_code"].astype(str).fillna("UNKNOWN")
-        enc = LabelEncoder()
-        df["product_encoded"] = enc.fit_transform(df["product_code"])
+def _add_lag_rolling(df: pd.DataFrame, group_col: str | None) -> pd.DataFrame:
+    """Add lag and rolling-mean features, optionally grouped by product."""
+    def _compute(s: pd.Series) -> pd.DataFrame:
+        result = {}
+        for lag in LAG_WINDOWS:
+            result[f"lag_{lag}"] = s.shift(lag)
+        for win in ROLLING_WINDOWS:
+            result[f"rolling_{win}"] = s.shift(1).rolling(win, min_periods=1).mean()
+        return pd.DataFrame(result, index=s.index)
 
-        # Per-product rolling stats (window=7, min 1 observation)
-        df = df.sort_values(["product_code", "date"])
-        df["moving_avg"] = (
-            df.groupby("product_code")["quantity"]
-            .transform(lambda s: s.shift(1).rolling(7, min_periods=1).mean())
-            .fillna(df["quantity"].mean())
-        )
-        df["consumption"] = (
-            df.groupby("product_code")["quantity"]
-            .transform(lambda s: s.diff().abs())
-            .fillna(0)
-        )
+    if group_col:
+        parts = []
+        for _, grp in df.groupby(group_col, sort=False):
+            parts.append(_compute(grp["quantity"]))
+        lag_df = pd.concat(parts).sort_index()
     else:
-        df = df.sort_values("date")
-        df["moving_avg"] = (
-            df["quantity"].shift(1).rolling(7, min_periods=1).mean().fillna(df["quantity"].mean())
-        )
-        df["consumption"] = df["quantity"].diff().abs().fillna(0)
+        lag_df = _compute(df["quantity"])
 
-    feature_cols = ["month", "day_of_week", "moving_avg", "consumption"]
+    return pd.concat([df, lag_df], axis=1)
+
+
+def build_features(monthly_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
+    """
+    Build the training feature matrix from monthly aggregated data.
+
+    Returns (X, y) where y = quantity and X contains all lag/rolling/temporal features.
+    Rows that have NaN lag values (first N rows per product) are dropped — this is
+    expected behaviour for time-series lag features.
+    """
+    df = monthly_df.copy()
+    has_product = "product_encoded" in df.columns
+
+    df = _add_time_features(df)
+    df = _add_lag_rolling(df, "product_code" if has_product else None)
+
+    # Drop rows where lag_12 is still NaN (not enough history)
+    df = df.dropna(subset=[f"lag_{max(LAG_WINDOWS)}"])
+
+    feature_cols = (
+        ["month", "quarter", "year", "month_index"]
+        + [f"lag_{l}" for l in LAG_WINDOWS]
+        + [f"rolling_{w}" for w in ROLLING_WINDOWS]
+    )
     if has_product:
         feature_cols.append("product_encoded")
 
     X = df[feature_cols].copy()
     y = df["quantity"].copy()
 
-    print(f"[FEATURES] Feature columns: {feature_cols}")
+    print(f"[FEATURES] Feature cols: {feature_cols}")
     print(f"[FEATURES] X shape: {X.shape}, y shape: {y.shape}")
-
     return X, y
+
+
+def build_prediction_row(
+    seed: pd.DataFrame,
+    target_period: pd.Period,
+    base_period: pd.Period,
+    product_encoded: int | None,
+) -> pd.DataFrame:
+    """
+    Build a single feature row for `target_period` using `seed` as the
+    historical window.  `seed` must be sorted chronologically and contain
+    at least the previous months needed for the longest lag.
+    """
+    qty = seed["quantity"].values  # chronological order, most recent last
+
+    def _lag(n: int) -> float:
+        idx = len(qty) - n
+        return float(qty[idx]) if idx >= 0 else float(np.mean(qty))
+
+    def _rolling_mean(n: int) -> float:
+        window = qty[-n:] if len(qty) >= n else qty
+        return float(np.mean(window)) if len(window) > 0 else 0.0
+
+    month_index = (target_period.year - base_period.year) * 12 + (
+        target_period.month - base_period.month
+    )
+
+    row: dict[str, float] = {
+        "month":       float(target_period.month),
+        "quarter":     float((target_period.month - 1) // 3 + 1),
+        "year":        float(target_period.year),
+        "month_index": float(month_index),
+    }
+    for l in LAG_WINDOWS:
+        row[f"lag_{l}"] = _lag(l)
+    for w in ROLLING_WINDOWS:
+        row[f"rolling_{w}"] = _rolling_mean(w)
+    if product_encoded is not None:
+        row["product_encoded"] = float(product_encoded)
+
+    return pd.DataFrame([row])

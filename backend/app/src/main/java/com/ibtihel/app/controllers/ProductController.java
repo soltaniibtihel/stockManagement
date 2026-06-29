@@ -1,6 +1,8 @@
 package com.ibtihel.app.controllers;
 
 import com.ibtihel.app.entities.Product;
+import com.ibtihel.app.entities.ProductType;
+import com.ibtihel.app.repositories.ProductRepository;
 import com.ibtihel.app.services.product.ProductService;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,10 +13,12 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ProductController {
 
-    private final ProductService productService;
+    private final ProductService    productService;
+    private final ProductRepository productRepository;
 
-    public ProductController(ProductService productService) {
-        this.productService = productService;
+    public ProductController(ProductService productService, ProductRepository productRepository) {
+        this.productService    = productService;
+        this.productRepository = productRepository;
     }
 
     // CREATE
@@ -58,6 +62,15 @@ public class ProductController {
     @GetMapping("/category/{categoryId}")
     public List<Product> getProductsByCategory(@PathVariable Long categoryId) {
         return productService.getProductsByCategory(categoryId);
+    }
+
+    /**
+     * GET /api/products/by-type/RAW_MATERIAL
+     * Retourne tous les produits d'un type donné.
+     */
+    @GetMapping("/by-type/{type}")
+    public List<Product> getByType(@PathVariable ProductType type) {
+        return productRepository.findByProductType(type);
     }
 }
 

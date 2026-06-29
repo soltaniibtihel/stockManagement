@@ -25,6 +25,8 @@ import ProductMovementList from './pages/ProductMovements/ProductMovementList';
 import ProductMovementForm from './pages/ProductMovements/ProductMovementForm';
 import ProductMovementDetailView from './pages/ProductMovements/ProductMovementDetailView';
 import Dashboard from './pages/Dashboard/Dashboard';
+import GalleryPage from './pages/Gallery/GalleryPage';
+import ModelComparison from './pages/ML/ModelComparison';
 
 const ProtectedLayout = () => {
   return (
@@ -45,7 +47,8 @@ function App() {
           
           {/* Protected Routes wrapped in Layout */}
           <Route element={<ProtectedLayout />}>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<GalleryPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             
             {/* We could restrict users route to ADMIN or DIRECTOR */}
             <Route path="/users" element={
@@ -84,7 +87,10 @@ function App() {
             <Route path="/product-movements/new" element={<ProductMovementForm />} />
             <Route path="/product-movements/edit/:id" element={<ProductMovementForm />} />
             <Route path="/product-movements/:id/detail" element={<ProductMovementDetailView />} />
-            
+
+            {/* ML — Comparaison des modèles */}
+            <Route path="/ml/compare" element={<ModelComparison />} />
+
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

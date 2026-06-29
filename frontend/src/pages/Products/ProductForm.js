@@ -8,8 +8,16 @@ const ProductForm = () => {
   const navigate = useNavigate();
   const isEditMode = !!id;
 
+  const PRODUCT_TYPES = [
+    { value: 'RAW_MATERIAL',    label: '🧪 Matière Première (Raw Material)' },
+    { value: 'FINISHED_PRODUCT',label: '📦 Produit Fini (Finished Product)' },
+    { value: 'SEMI_FINISHED',   label: '⚙️ Semi-Fini (Semi-Finished)' },
+    { value: 'PACKAGING',       label: '🗃️ Emballage (Packaging)' },
+    { value: 'BY_PRODUCT',      label: '♻️ Sous-Produit (By-Product)' },
+  ];
+
   const [categories, setCategories] = useState([]);
-    const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     code: '',
     name: '',
     description: '',
@@ -17,6 +25,7 @@ const ProductForm = () => {
     shelfLife: 0,
     stockQuantity: 0,
     safetyStock: 0,
+    productType: 'FINISHED_PRODUCT',
     category: { id: '' }
   });
   const [loading, setLoading] = useState(true);
@@ -158,10 +167,25 @@ const ProductForm = () => {
             </div>
 
             <div className="form-group">
+              <label>Type de produit</label>
+              <select
+                name="productType"
+                value={formData.productType || 'FINISHED_PRODUCT'}
+                onChange={handleChange}
+                style={{ fontWeight: formData.productType === 'RAW_MATERIAL' ? 600 : 'normal',
+                         borderColor: formData.productType === 'RAW_MATERIAL' ? 'rgba(245,158,11,0.5)' : '' }}
+              >
+                {PRODUCT_TYPES.map(t => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
               <label>Category</label>
-              <select 
-                name="categoryId" 
-                value={formData.category.id || ''} 
+              <select
+                name="categoryId"
+                value={formData.category?.id || ''}
                 onChange={handleChange}
               >
                 <option value="">-- Select Category --</option>

@@ -2,6 +2,7 @@ package com.ibtihel.app.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.ibtihel.app.entities.ProductionStatus;
 
 import java.time.LocalDateTime;
 
@@ -33,6 +34,24 @@ public class Production {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ProductionStatus status = ProductionStatus.PLANIFIEE;
+
+    @Column(name = "notes", length = 500)
+    private String notes;
+
+    /** ID du mouvement WO généré automatiquement lors de la réalisation. */
+    @Column(name = "generated_movement_id")
+    private Long generatedMovementId;
+
+    public ProductionStatus getStatus() { return status; }
+    public void setStatus(ProductionStatus status) { this.status = status; }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+    public Long getGeneratedMovementId() { return generatedMovementId; }
+    public void setGeneratedMovementId(Long generatedMovementId) { this.generatedMovementId = generatedMovementId; }
 
     public Long getId() {
         return id;

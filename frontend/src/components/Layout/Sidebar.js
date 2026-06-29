@@ -1,14 +1,16 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  Users, 
-  Package, 
-  Settings, 
-  LayoutDashboard, 
-  Activity, 
-  BookOpen, 
+import {
+  Users,
+  Package,
+  Settings,
+  LayoutDashboard,
+  Activity,
+  BookOpen,
   Home,
-  LogOut
+  LogOut,
+  Store,
+  GitCompare
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './Sidebar.css';
@@ -23,7 +25,8 @@ const Sidebar = () => {
   };
 
   const menuItems = [
-    { path: '/', name: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+    { path: '/', name: "Jadida's Gallery", icon: <Store size={20} /> },
+    { path: '/dashboard', name: 'Dashboard', icon: <LayoutDashboard size={20} /> },
     { path: '/users', name: 'Users', icon: <Users size={20} />, roles: ['ADMIN', 'DIRECTOR'] },
     { path: '/categories', name: 'Categories', icon: <Settings size={20} /> },
     { path: '/products', name: 'Products', icon: <Package size={20} /> },
@@ -32,6 +35,7 @@ const Sidebar = () => {
     { path: '/recipes', name: 'Recipes', icon: <BookOpen size={20} /> },
     { path: '/warehouses', name: 'Warehouses', icon: <Home size={20} /> },
     { path: '/product-movements', name: 'Product Movements', icon: <Activity size={20} /> },
+    { path: '/ml/compare', name: 'ML Comparison', icon: <GitCompare size={20} /> },
   ];
 
   const visibleMenuItems = menuItems.filter(item => {
